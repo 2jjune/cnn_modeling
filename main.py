@@ -75,7 +75,10 @@ data_augmentation = tf.keras.Sequential([
     layers.RandomFlip("horizontal_and_vertical"),
     layers.RandomRotation(0.2),
     layers.RandomBrightness(factor=0.1),
-    
+    layers.RandomZoom(.05, .1),
+    layers.RandomContrast(0.05),
+    # layers.RandomCrop(224,224),
+
 ])
 
 print(train_ds)
@@ -178,13 +181,13 @@ def make_model(input_shape, num_classes):
     outputs = Dense(num_classes, activation="softmax")(x)
 
     model = Model(inputs=inputs, outputs=outputs)
-    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+    # model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
     return model
 
 
 # 모델 생성 (예: CIFAR-10의 입력 크기와 클래스 수 사용)
 model = make_model((224, 224, 3), 10)
-# model.summary()
+model.summary()
 # base_model = tf.keras.applications.VGG16(include_top=False,
 #                                                   weights='imagenet',
 #                                                   input_shape=(224, 224, 3))
@@ -264,6 +267,28 @@ model.fit(train_ds,
           epochs=80,
           callbacks=callback
           )
+
+#-----------top 5용
+# model.compile(
+#         optimizer=optimizer,
+#         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+#         metrics=[
+#             keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
+#             keras.metrics.SparseTopKCategoricalAccuracy(5, name="top-5-accuracy"),
+#         ],
+#     )
+#
+#     history = model.fit(
+#         x=x_train,
+#         y=y_train,
+#         batch_size=BATCH_SIZE,
+#         epochs=EPOCHS,
+#         validation_split=0.1,
+#     )
+#     _, accuracy, top_5_accuracy = model.evaluate(x_test, y_test, batch_size=BATCH_SIZE)
+#--------------
+
+
 
 # model.save('my_model.h5')
 # predictions = model.predict(test_ds)
